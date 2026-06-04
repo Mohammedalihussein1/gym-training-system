@@ -96,4 +96,86 @@
 
         <div class="two-col">
 
->
+           <!-- TODAY'S WORKOUTS -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Today's Workouts</div>
+                        <div class="card-subtitle">Logged exercises for today</div>
+                    </div>
+                    <a href="log_workout.html" class="btn-secondary" style="font-size:13px; padding:8px 16px;">+ Log</a>
+                </div>
+                <ul class="exercise-list" id="todayWorkoutList">
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No workouts logged today. <a href="log_workout.html" style="color:var(--accent);">Log now →</a></li>
+                </ul>
+            </div>
+ <!-- TODAY'S NUTRITION -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Today's Nutrition</div>
+                        <div class="card-subtitle">Meals and calories consumed</div>
+                    </div>
+                    <a href="nutrition.html" class="btn-secondary" style="font-size:13px; padding:8px 16px;">+ Add</a>
+                </div>
+                <ul class="exercise-list" id="todayNutritionList">
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals logged today. <a href="nutrition.html" style="color:var(--accent);">Log now →</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- PROFILE SUMMARY & WEEKLY GOAL -->
+        <div class="two-col">
+
+            <div class="card">
+                <div class="card-title" style="margin-bottom:16px;">My Profile</div>
+                <div class="profile-img-wrap" id="dashAvatar">MU</div>
+                <table style="width:100%; font-size:14px;">
+                    <tr>
+                        <td style="color:var(--muted); padding:8px 0; border-bottom:1px solid var(--border);">Full Name</td>
+                        <td style="text-align:right; padding:8px 0; border-bottom:1px solid var(--border); font-weight:500;" id="profileName">—</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--muted); padding:8px 0; border-bottom:1px solid var(--border);">Student ID</td>
+                        <td style="text-align:right; padding:8px 0; border-bottom:1px solid var(--border);" id="profileId">—</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--muted); padding:8px 0; border-bottom:1px solid var(--border);">Height</td>
+                        <td style="text-align:right; padding:8px 0; border-bottom:1px solid var(--border);" id="profileHeight">— cm</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--muted); padding:8px 0;">Weight</td>
+                        <td style="text-align:right; padding:8px 0; font-weight:500;" id="profileWeight">— kg</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title" style="margin-bottom:16px;">Weekly Goals</div>
+
+                <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Workouts (target: 5/week)</p>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="workoutGoalBar" style="width:0%"></div>
+                </div>
+                <p style="font-size:12px; color:var(--muted); margin-top:4px; margin-bottom:20px;" id="workoutGoalText">0 / 5 sessions</p>
+
+                <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Calories Burned (target: 3,500 kcal/week)</p>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="calorieGoalBar" style="width:0%; background: linear-gradient(90deg, var(--accent2), #ff8a00);"></div>
+                </div>
+                <p style="font-size:12px; color:var(--muted); margin-top:4px;" id="calorieGoalText">0 / 3,500 kcal</p>
+
+                <div class="divider"></div>
+
+                <div style="font-size:13px; color:var(--muted);">BMI Status: <span id="bmiStatus" style="color:var(--accent); font-weight:500;">—</span></div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
