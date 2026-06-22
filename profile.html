@@ -65,7 +65,107 @@
         <div id="successMsg" class="alert alert-success" style="display:none;">✓ Profile updated successfully!</div>
 
         <div class="two-col">
+<!-- EDIT FORM -->
+            <div class="card">
+                <div class="card-title" style="margin-bottom:20px;">Edit Profile</div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID (cannot be changed)</label>
+                        <input type="text" id="editId" disabled style="opacity:0.5; cursor:not-allowed;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="editAge" min="10" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="editGender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="number" id="editHeight" min="100" max="250">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" id="editWeight" min="30" max="300">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Program / Department</label>
+                        <input type="text" id="editProgram">
+                    </div>
+                    <button type="submit" class="btn-primary">SAVE CHANGES</button>
+                </form>
+            </div>
 
+        </div>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+(function() {
+    const user = JSON.parse(sessionStorage.getItem('ft_current'));
+    if (!user) { window.location.href = 'index.html'; return; }
+
+    function initials(n) { return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+    function calcBMI(w,h) { return (w/((h/100)**2)).toFixed(1); }
+
+    function loadProfile() {
+        document.getElementById('profileAvatar').textContent      = initials(user.name);
+        document.getElementById('sidebarAvatar').textContent      = initials(user.name);
+        document.getElementById('sidebarName').textContent        = user.name;
+        document.getElementById('profileDisplayName').textContent = user.name;
+        document.getElementById('profileDisplayId').textContent   = user.id;
+        document.getElementById('profileRole').textContent        = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        document.getElementById('profileProgram').textContent     = user.program;
+        document.getElementById('profileH').textContent          = user.height + ' cm';
+        document.getElementById('profileW').textContent          = user.weight + ' kg';
+        document.getElementById('profileBMI').textContent        = calcBMI(user.weight, user.height);
+
+        document.getElementById('editName').value    = user.name;
+        document.getElementById('editId').value      = user.id;
+        document.getElementById('editAge').value     = user.age;
+        document.getElementById('editGender').value  = user.gender || 'Male';
+        document.getElementById('editHeight').value  = user.height;
+        document.getElementById('editWeight').value  = user.weight;
+        document.getElementById('editProgram').value = user.program;
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        user.name    = document.getElementById('editName').value.trim();
+        user.age     = parseInt(document.getElementById('editAge').value);
+        user.gender  = document.getElementById('editGender').value;
+        user.height  = parseInt(document.getElementById('editHeight').value);
+        user.weight  = parseInt(document.getElementById('editWeight').value);
+        user.program = document.getElementById('editProgram').value.trim();
+        sessionStorage.setItem('ft_current', JSON.stringify(user));
+
+        // Update in stored users
+        const stored = JSON.parse(localStorage.getItem('ft_users')) || [];
+        const idx = stored.findIndex(u => u.username === user.username);
+        if (idx !== -1) { stored[idx] = user; localStorage.setItem('ft_users', JSON.stringify(stored)); }
+
+        loadProfile();
+        document.getElementById('successMsg').style.display = 'flex';
+        setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
+    });
+
+    loadProfile();
+})();
+</script>
 <body>
     
 
