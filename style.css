@@ -139,3 +139,135 @@ a { text-decoration: none; color: inherit; }
     color: var(--muted);
     letter-spacing: 1px;
 }
+/* 4.3 - Auth Right Panel (Form side) */
+.auth-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    background: var(--bg);
+}
+
+.auth-form-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-form-box h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+
+.auth-form-box p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 36px;
+}
+
+/* 4.4 - Form Inputs & Labels */
+.form-group { margin-bottom: 18px; }
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+/* Yellow border highlight on focus */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--accent); }
+
+.form-group select option { background: var(--bg2); }
+
+/* Two inputs side by side (used in register.html) */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* 4.5 - Buttons */
+
+/* Primary yellow button — Login, Register, Save */
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(232,255,71,0.25);
+}
+
+/* Secondary outline button — used in cards and sidebar */
+.btn-secondary {
+    padding: 10px 20px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-secondary:hover { border-color: var(--accent); background: rgba(232,255,71,0.05); }
+
+/* Red danger button — used for Delete actions */
+.btn-danger {
+    padding: 10px 20px;
+    background: rgba(255,71,87,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover { background: rgba(255,71,87,0.2); }
+
+/* 4.6 - Auth Links (e.g. "Don't have an account? Register") */
+.auth-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.auth-link a { color: var(--accent); font-weight: 500; }
+
