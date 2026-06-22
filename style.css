@@ -1,0 +1,141 @@
+
+/* ============================================================
+   1. GOOGLE FONTS IMPORT
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap');
+
+
+/* ============================================================
+   2. CSS VARIABLES (Colors, Sizes)
+   ============================================================ */
+
+:root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --card: #16161f;
+    --border: rgba(255,255,255,0.07);
+    --accent: #e8ff47;
+    --accent2: #ff4757;
+    --text: #f0f0f0;
+    --muted: #6b6b80;
+    --sidebar: 240px;
+}
+
+
+/* ============================================================
+   3. GLOBAL RESET & BASE STYLES
+   ============================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+a { text-decoration: none; color: inherit; }
+/* ============================================================
+   4. AUTH PAGES - LOGIN (index.html) & REGISTER (register.html)
+   ============================================================ */
+
+/* 4.1 - Auth Page Layout */
+.auth-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+/* 4.2 - Auth Left Panel (Branding / Logo side) */
+.auth-left {
+    background: var(--bg2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative glow top-left */
+.auth-left::before {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%);
+    top: -100px;
+    left: -100px;
+    border-radius: 50%;
+}
+
+/* Decorative glow bottom-right */
+.auth-left::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,71,87,0.07) 0%, transparent 70%);
+    bottom: -80px;
+    right: -80px;
+    border-radius: 50%;
+}
+
+/* Big brand name */
+.auth-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 4px;
+    line-height: 1;
+    color: var(--accent);
+    position: relative;
+    z-index: 1;
+}
+
+/* Subtitle under brand name */
+.auth-brand span {
+    display: block;
+    font-size: 18px;
+    letter-spacing: 8px;
+    color: var(--muted);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    margin-top: 8px;
+}
+
+/* Short description text */
+.auth-tagline {
+    margin-top: 40px;
+    font-size: 15px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+    max-width: 280px;
+}
+
+/* Stats row: 100+ Students, 500+ Sessions, 30+ Exercises */
+.auth-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+}
+
+.auth-stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+}
