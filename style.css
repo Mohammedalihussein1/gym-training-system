@@ -428,3 +428,73 @@ a { text-decoration: none; color: inherit; }
 }
 
 
+/* ============================================================
+   8. STAT CARDS
+   Used on: dashboard.html, progress.html, admin.html
+   ============================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative glow circle top-right of each card */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    top: -20px;
+    right: -20px;
+    opacity: 0.15;
+}
+
+.stat-card.yellow::before { background: var(--accent); }
+.stat-card.red::before    { background: var(--accent2); }
+.stat-card.blue::before   { background: #4facfe; }
+.stat-card.green::before  { background: #43e97b; }
+
+/* Icon/emoji box */
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+.stat-icon.yellow { background: rgba(232,255,71,0.12); }
+.stat-icon.red    { background: rgba(255,71,87,0.12); }
+.stat-icon.blue   { background: rgba(79,172,254,0.12); }
+.stat-icon.green  { background: rgba(67,233,123,0.12); }
+
+/* Large number value */
+.stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.stat-value.yellow { color: var(--accent); }
+.stat-value.red    { color: var(--accent2); }
+.stat-value.blue   { color: #4facfe; }
+.stat-value.green  { color: #43e97b; }
+
+/* Label below the number */
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 0.5px; }
