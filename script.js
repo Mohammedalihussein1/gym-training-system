@@ -199,3 +199,151 @@ if (workoutForm) {
         });
     }
 }
+function renderWorkoutHistory(username, filter = '', sort = 'newest') {
+    const list = document.getElementById('workoutHistoryList');
+    if (!list) return;
+    let workouts = getWorkouts(username);
+
+    if (filter) workouts = workouts.filter(w => w.type.toLowerCase().includes(filter.toLowerCase()));
+    if (sort === 'newest')   workouts.sort((a,b) => b.date.localeCompare(a.date));
+    if (sort === 'oldest')   workouts.sort((a,b) => a.date.localeCompare(b.date));
+    if (sort === 'calories') workouts.sort((a,b) => b.calories - a.calories);
+
+    if (workouts.length === 0) {
+        list.innerHTML = '<li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No workouts found.</li>';
+        return;
+    }
+    list.innerHTML = workouts.slice().reverse().map(w => `
+        <li class="exercise-item">
+            <div>
+                <div class="exercise-item-name">${w.type}</div>
+                <div class="exercise-item-detail">${formatDate(w.date)} · ${w.sets} sets · ${w.reps}</div>
+            </div>
+            <div style="text-align:right;">
+                <span class="badge badge-yellow">${w.calories} kcal</span>
+                <div style="font-size:12px; color:var(--muted); margin-top:4px;">${w.duration} min</div>
+                <button onclick="deleteWorkout('${w.id}', '${username}')" class="btn-danger" style="margin-top:6px; padding:4px 10px; font-size:12px;">Delete</button>
+            </div>
+        </li>
+    `).join('');
+}
+
+function deleteWorkout(id, username) {
+    if (!confirm('Delete this workout?')) return;
+    let workouts = getWorkouts(username);
+    workouts = workouts.filter(w => w.id != id);
+    saveWorkouts(username, workouts);
+    renderWorkoutHistory(username);
+}
+
+function filterWorkouts() {
+    const user = getCurrentUser();
+    if (!user) return;
+    const filter = document.getElementById('searchWorkout').value;
+    const sort   = document.getElementById('sortWorkout').value;
+    renderWorkoutHistory(user.username, filter, sort);
+}
+
+// ============================================================
+// NUTRITION LOG
+// ============================================================
+function getMeals(username) {
+    return JSON.parse(localStorage.getItem('ft_meals_' + username)) || [];
+}
+
+function saveMeals(username, data) {
+    localStorage.setItem('ft_meals_' + username, JSON.stringify(data));
+}
+
+const nutritionForm = document.getElementById('nutritionForm');
+if (nutritionForm) {
+    const user = requireLogin(['student']);
+    if (user) {
+        initSidebar();
+        showDate();
+        document.getElementById('nDate').value = today();
+        renderNutritionStats(user.username);
+        renderMealHistory(user.username);
+
+        nutritionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const meal = {
+                id:       Date.now(),
+                date:     document.getElementById('nDate').value,
+                mealType: document.getElementById('nMealType').value,
+                food:     document.getElementById('nFood').value,
+                calories: parseInt(document.getElementById('nCalories').value),
+                protein:  parseInt(document.getElementById('nProtein').value) || 0,
+                carbs:    parseInt(document.getElementById('nCarbs').value)    || 0,
+                fats:     parseInt(document.getElementById('nFats').value)     || 0
+            };
+            const meals = getMeals(user.username);
+            meals.push(meal);
+            saveMeals(user.username, meals);
+            nutritionForm.reset();
+            document.getElementById('nDate').value = today();
+            document.getElementById('successMsg').style.display = 'flex';
+            setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
+            renderNutritionStats(user.username);
+            renderMealHistory(user.username);
+        });
+    }
+}
+
+function renderNutritionStats(username) {
+    const todayStr = today();
+    const meals = getMeals(username).filter(m => m.date === todayStr);
+    const totalCal  = meals.reduce((s, m) => s + m.calories, 0);
+    const totalProt = meals.reduce((s, m) => s + m.protein, 0);
+    const totalCarb = meals.reduce((s, m) => s + m.carbs, 0);
+    const el1 = document.getElementById('totalCalIn');
+    const el2 = document.getElementById('totalProtein');
+    const el3 = document.getElementById('totalCarbs');
+    if (el1) el1.textContent = totalCal;
+    if (el2) el2.textContent = totalProt + 'g';
+    if (el3) el3.textContent = totalCarb + 'g';
+}
+
+function renderMealHistory(username, filter = '', typeFilter = 'all') {
+    const list = document.getElementById('mealHistoryList');
+    if (!list) return;
+    let meals = getMeals(username);
+    if (filter)             meals = meals.filter(m => m.food.toLowerCase().includes(filter.toLowerCase()));
+    if (typeFilter !== 'all') meals = meals.filter(m => m.mealType === typeFilter);
+    meals.sort((a,b) => b.date.localeCompare(a.date));
+
+    if (meals.length === 0) {
+        list.innerHTML = '<li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals found.</li>';
+        return;
+    }
+    list.innerHTML = meals.map(m => `
+        <li class="exercise-item">
+            <div>
+                <div class="exercise-item-name">${m.food}</div>
+                <div class="exercise-item-detail">${formatDate(m.date)} · ${m.mealType}</div>
+                <div class="exercise-item-detail">Protein: ${m.protein}g · Carbs: ${m.carbs}g · Fats: ${m.fats}g</div>
+            </div>
+            <div style="text-align:right;">
+                <span class="badge badge-green">${m.calories} kcal</span>
+                <button onclick="deleteMeal('${m.id}', '${username}')" class="btn-danger" style="margin-top:6px; padding:4px 10px; font-size:12px;">Delete</button>
+            </div>
+        </li>
+    `).join('');
+}
+
+function deleteMeal(id, username) {
+    if (!confirm('Delete this meal?')) return;
+    let meals = getMeals(username);
+    meals = meals.filter(m => m.id != id);
+    saveMeals(username, meals);
+    renderNutritionStats(username);
+    renderMealHistory(username);
+}
+
+function filterMeals() {
+    const user = getCurrentUser();
+    if (!user) return;
+    const filter = document.getElementById('searchMeal').value;
+    const type   = document.getElementById('filterMealType').value;
+    renderMealHistory(user.username, filter, type);
+}
