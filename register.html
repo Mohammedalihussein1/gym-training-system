@@ -34,7 +34,86 @@
             </div>
         </div>
     </div>
+ <!-- RIGHT PANEL -->
+    <div class="auth-right">
+        <div class="auth-form-box" style="max-width: 480px;">
 
-    
+            <h2>Create Account</h2>
+            <p>Fill in your details to register</p>
+
+            <div id="successMsg" class="alert alert-success" style="display:none;">
+                ✓ Account created! Redirecting to login...
+            </div>
+            <div id="errorMsg" class="alert alert-error" style="display:none;"></div>
+
+            <form id="registerForm">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" id="regId" placeholder="e.g. STU001" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUser" placeholder="Choose a username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPass" placeholder="At least 6 characters" required minlength="6">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="regAge" placeholder="Age" min="10" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="regGender" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">
+                                Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="regHeight" placeholder="e.g. 175" min="100" max="250" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="regWeight" placeholder="e.g. 70" min="30" max="300" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Program / Department</label>
+                    <input type="text" id="regProgram" placeholder="e.g. Computer Science" required>
+                </div>
+
+                <button type="submit" class="btn-primary">CREATE ACCOUNT</button>
+            </form>
+
+            <div class="auth-link">
+                Already have an account? <a href="index.html">Login here</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
