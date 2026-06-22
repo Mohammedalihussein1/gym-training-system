@@ -271,3 +271,121 @@ a { text-decoration: none; color: inherit; }
 
 .auth-link a { color: var(--accent); font-weight: 500; }
 
+/* ============================================================
+   5. APP LAYOUT
+   Flex wrapper used on all pages after login
+   ============================================================ */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   6. SIDEBAR NAVIGATION
+   Used on: dashboard.html, log_workout.html, nutrition.html,
+            progress.html, profile.html, admin.html
+   ============================================================ */
+
+/* 6.1 - Sidebar Container */
+.sidebar {
+    width: var(--sidebar);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* 6.2 - Sidebar Logo */
+.sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--accent);
+}
+
+.sidebar-logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-top: 2px;
+}
+
+/* 6.3 - Sidebar User Info (Avatar + Name + Role) */
+.sidebar-user {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Circular avatar showing user initials */
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: var(--bg);
+    flex-shrink: 0;
+}
+
+.sidebar-user-name { font-size: 14px; font-weight: 500; }
+.sidebar-user-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; }
+
+/* Small uppercase label above nav groups ("MAIN", "PROFILE") */
+.nav-section-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 12px;
+    margin: 16px 0 8px;
+}
+
+/* 6.4 - Sidebar Navigation Items */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+}
+
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+
+/* Yellow highlight for the currently active page */
+.nav-item.active {
+    background: rgba(232,255,71,0.1);
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* 6.5 - Sidebar Bottom (Logout button) */
+.sidebar-bottom {
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+}
