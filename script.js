@@ -347,3 +347,81 @@ function filterMeals() {
     const type   = document.getElementById('filterMealType').value;
     renderMealHistory(user.username, filter, type);
 }
+// DASHBOARD
+// ============================================================
+const dashboardPage = document.getElementById('todayDate');
+if (dashboardPage && document.getElementById('totalCalories')) {
+    const user = requireLogin(['student']);
+    if (user) {
+        initSidebar();
+        showDate();
+
+        // Profile info
+        document.getElementById('welcomeMsg').textContent = 'Welcome back, ' + user.name + '!';
+        document.getElementById('profileName').textContent   = user.name;
+        document.getElementById('profileId').textContent     = user.id;
+        document.getElementById('profileHeight').textContent = user.height + ' cm';
+        document.getElementById('profileWeight').textContent = user.weight + ' kg';
+        document.getElementById('dashAvatar').textContent    = initials(user.name);
+
+        const bmi = calcBMI(user.weight, user.height);
+        document.getElementById('userBMI').textContent   = bmi;
+        document.getElementById('bmiStatus').textContent = bmiStatus(bmi);
+
+        // Today's stats
+        const todayStr   = today();
+        const workouts   = getWorkouts(user.username).filter(w => w.date === todayStr);
+        const meals      = getMeals(user.username).filter(m => m.date === todayStr);
+        const calBurned  = workouts.reduce((s, w) => s + w.calories, 0);
+        const calIn      = meals.reduce((s, m) => s + m.calories, 0);
+
+        document.getElementById('totalCalories').textContent = calBurned;
+        document.getElementById('caloriesIn').textContent    = calIn;
+
+        // Weekly workouts
+        const now = new Date();
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay());
+        const allWorkouts = getWorkouts(user.username);
+        const weekWorkouts = allWorkouts.filter(w => new Date(w.date) >= weekStart);
+        document.getElementById('totalWorkouts').textContent = weekWorkouts.length;
+
+        // Goals
+        const wPct = Math.min((weekWorkouts.length / 5) * 100, 100);
+        const weekCal = weekWorkouts.reduce((s, w) => s + w.calories, 0);
+        const cPct = Math.min((weekCal / 3500) * 100, 100);
+        document.getElementById('workoutGoalBar').style.width  = wPct + '%';
+        document.getElementById('calorieGoalBar').style.width  = cPct + '%';
+        document.getElementById('workoutGoalText').textContent = weekWorkouts.length + ' / 5 sessions';
+        document.getElementById('calorieGoalText').textContent = weekCal + ' / 3,500 kcal';
+
+        // Today's workouts
+        const wList = document.getElementById('todayWorkoutList');
+        if (workouts.length > 0) {
+            wList.innerHTML = workouts.map(w => `
+                <li class="exercise-item">
+                    <div>
+                        <div class="exercise-item-name">${w.type}</div>
+                        <div class="exercise-item-detail">${w.sets} sets · ${w.reps}</div>
+                    </div>
+                    <span class="badge badge-yellow">${w.calories} kcal</span>
+                </li>
+            `).join('');
+        }
+
+        // Today's nutrition
+        const nList = document.getElementById('todayNutritionList');
+        if (meals.length > 0) {
+            nList.innerHTML = meals.map(m => `
+                <li class="exercise-item">
+                    <div>
+                        <div class="exercise-item-name">${m.food}</div>
+                        <div class="exercise-item-detail">${m.mealType}</div>
+                    </div>
+                    <span class="badge badge-green">${m.calories} kcal</span>
+                </li>
+            `).join('');
+        }
+    }
+}
+
