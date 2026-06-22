@@ -425,3 +425,170 @@ if (dashboardPage && document.getElementById('totalCalories')) {
     }
 }
 
+// PROGRESS PAGE
+// ============================================================
+const progressPage = document.getElementById('allCalories');
+if (progressPage) {
+    const user = requireLogin(['student']);
+    if (user) {
+        initSidebar();
+        showDate();
+        renderProgressTable(user.username);
+    }
+}
+
+function renderProgressTable(username, filter = '', sort = 'newest', dateFilter = '') {
+    let workouts = getWorkouts(username);
+
+    // Overall stats
+    const totalCal  = workouts.reduce((s, w) => s + w.calories, 0);
+    const totalMin  = workouts.reduce((s, w) => s + w.duration, 0);
+    const uniqueDays = [...new Set(workouts.map(w => w.date))].length;
+    const el1 = document.getElementById('allCalories');
+    const el2 = document.getElementById('allSessions');
+    const el3 = document.getElementById('allMinutes');
+    const el4 = document.getElementById('allDays');
+    if (el1) el1.textContent = totalCal;
+    if (el2) el2.textContent = workouts.length;
+    if (el3) el3.textContent = totalMin;
+    if (el4) el4.textContent = uniqueDays;
+
+    if (filter)     workouts = workouts.filter(w => w.type.toLowerCase().includes(filter.toLowerCase()));
+    if (dateFilter) workouts = workouts.filter(w => w.date === dateFilter);
+    if (sort === 'newest')   workouts.sort((a,b) => b.date.localeCompare(a.date));
+    if (sort === 'oldest')   workouts.sort((a,b) => a.date.localeCompare(b.date));
+    if (sort === 'calories') workouts.sort((a,b) => b.calories - a.calories);
+    if (sort === 'duration') workouts.sort((a,b) => b.duration - a.duration);
+
+    const tbody = document.getElementById('progressTableBody');
+    if (!tbody) return;
+    if (workouts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:30px;">No workouts found.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = workouts.map((w, i) => `
+        <tr>
+            <td style="color:var(--muted)">${i + 1}</td>
+            <td>${formatDate(w.date)}</td>
+            <td><span class="badge badge-blue">${w.type}</span></td>
+            <td>${w.sets}</td>
+            <td>${w.reps}</td>
+            <td>${w.duration} min</td>
+            <td><span class="badge badge-yellow">${w.calories} kcal</span></td>
+            <td style="color:var(--muted); font-size:13px;">${w.notes || '—'}</td>
+            <td><button onclick="deleteWorkout('${w.id}', '${username}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">Delete</button></td>
+        </tr>
+    `).join('');
+}
+
+function filterProgress() {
+    const user = getCurrentUser();
+    if (!user) return;
+    const filter = document.getElementById('searchProgress').value;
+    const sort   = document.getElementById('sortProgress').value;
+    const date   = document.getElementById('filterDate').value;
+    renderProgressTable(user.username, filter, sort, date);
+}
+
+// ============================================================
+// ADMIN PAGE
+// ============================================================
+const adminPage = document.getElementById('totalStudents');
+if (adminPage) {
+    const user = requireLogin(['admin', 'coordinator']);
+    if (user) {
+        showDate();
+        renderAdminOverview();
+    }
+}
+
+function getAllStudentsData() {
+    const stored = JSON.parse(localStorage.getItem('ft_users')) || [];
+    const allStudents = [...DEMO_USERS.filter(u => u.role === 'student'), ...stored.filter(u => u.role === 'student')];
+    return allStudents;
+}
+
+function renderAdminOverview(filter = '', sort = 'az') {
+    const students = getAllStudentsData();
+    const el = document.getElementById('totalStudents');
+    if (el) el.textContent = students.length;
+
+    let totalSessions = 0, totalCal = 0, totalMeals = 0;
+    const allActivity = [];
+
+    students.forEach(s => {
+        const workouts = getWorkouts(s.username);
+        const meals    = getMeals(s.username);
+        totalSessions += workouts.length;
+        totalCal      += workouts.reduce((sum, w) => sum + w.calories, 0);
+        totalMeals    += meals.length;
+        workouts.forEach(w => allActivity.push({ student: s.name, ...w }));
+    });
+
+    const el2 = document.getElementById('totalSessions');
+    const el3 = document.getElementById('totalCalBurned');
+    const el4 = document.getElementById('totalMeals');
+    if (el2) el2.textContent = totalSessions;
+    if (el3) el3.textContent = totalCal;
+    if (el4) el4.textContent = totalMeals;
+
+    // Students table
+    let list = students.map(s => {
+        const workouts = getWorkouts(s.username);
+        const cal = workouts.reduce((sum, w) => sum + w.calories, 0);
+        return { ...s, sessionCount: workouts.length, calBurned: cal };
+    });
+
+    if (filter) list = list.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || s.id.toLowerCase().includes(filter.toLowerCase()));
+    if (sort === 'az')       list.sort((a,b) => a.name.localeCompare(b.name));
+    if (sort === 'za')       list.sort((a,b) => b.name.localeCompare(a.name));
+    if (sort === 'sessions') list.sort((a,b) => b.sessionCount - a.sessionCount);
+
+    const tbody = document.getElementById('adminStudentTable');
+    if (tbody) {
+        if (list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:30px;">No students found.</td></tr>';
+        } else {
+            tbody.innerHTML = list.map((s, i) => {
+                const bmi = calcBMI(s.weight, s.height);
+                const status = bmiStatus(bmi);
+                const statusClass = status === 'Normal' ? 'badge-green' : status === 'Overweight' ? 'badge-yellow' : 'badge-red';
+                return `<tr>
+                    <td style="color:var(--muted)">${i+1}</td>
+                    <td><strong>${s.name}</strong></td>
+                    <td style="color:var(--muted)">${s.id}</td>
+                    <td>${s.program}</td>
+                    <td><span class="badge badge-blue">${s.sessionCount}</span></td>
+                    <td><span class="badge badge-yellow">${s.calBurned} kcal</span></td>
+                    <td>${bmi}</td>
+                    <td><span class="badge ${statusClass}">${status}</span></td>
+                </tr>`;
+            }).join('');
+        }
+    }
+
+    // Recent activity
+    allActivity.sort((a,b) => b.date.localeCompare(a.date));
+    const recentTbody = document.getElementById('recentActivityTable');
+    if (recentTbody) {
+        if (allActivity.length === 0) {
+            recentTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:30px;">No activity yet.</td></tr>';
+        } else {
+            recentTbody.innerHTML = allActivity.slice(0, 10).map(a => `
+                <tr>
+                    <td><strong>${a.student}</strong></td>
+                    <td><span class="badge badge-blue">${a.type}</span></td>
+                    <td>${formatDate(a.date)}</td>
+                    <td><span class="badge badge-yellow">${a.calories} kcal</span></td>
+                    <td>${a.duration} min</td>
+                </tr>
+            `).join('');
+        }
+    }
+}
+
+function filterAdminStudents() {
+    const filter = document.getElementById('searchStudent').value;
+    const sort   = document.getElementById('sortStudent').value;
+    renderAdminOverview(filter, sort);
+}
