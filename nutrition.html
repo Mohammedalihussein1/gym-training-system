@@ -136,5 +136,36 @@
                     <button type="submit" class="btn-primary">LOG MEAL</button>
                 </form>
             </div>
+            <!-- MEAL HISTORY -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Meal History</div>
+                        <div class="card-subtitle">All your logged meals</div>
+                    </div>
+                </div>
+
+                <div class="search-bar">
+                    <input class="search-input" type="text" id="searchMeal" placeholder="Search by food..." oninput="filterMeals()">
+                    <select class="search-select" id="filterMealType" onchange="filterMeals()">
+                        <option value="all">All Meals</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snack">Snack</option>
+                    </select>
+                </div>
+
+                <ul class="exercise-list" id="mealHistoryList">
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals logged yet.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
