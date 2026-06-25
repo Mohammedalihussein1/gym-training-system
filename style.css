@@ -498,3 +498,289 @@ a { text-decoration: none; color: inherit; }
 
 /* Label below the number */
 .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 0.5px; }
+/* ============================================================
+   9. GENERAL CARDS
+   Used on: all inner pages
+   ============================================================ */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.card-title    { font-size: 16px; font-weight: 600; }
+.card-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+/* Horizontal divider line inside a card */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+
+/* ============================================================
+   10. TABLE STYLES
+   Used on: progress.html, admin.html
+   ============================================================ */
+
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+thead th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+}
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:hover { background: var(--bg3); }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 14px 16px; vertical-align: middle; }
+
+
+/* ============================================================
+   11. SEARCH & FILTER BAR
+   Used on: log_workout.html, nutrition.html,
+            progress.html, admin.html
+   ============================================================ */
+
+.search-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+
+/* Text search input */
+.search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 11px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus { border-color: var(--accent); }
+
+/* Dropdown sort/filter select */
+.search-select {
+    padding: 11px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.search-select option { background: var(--bg2); }
+
+
+/* ============================================================
+   12. BADGES & STATUS LABELS
+   Used on: all inner pages (tables, lists, cards)
+   ============================================================ */
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge-green  { background: rgba(67,233,123,0.12); color: #43e97b; }
+.badge-red    { background: rgba(255,71,87,0.12);  color: var(--accent2); }
+.badge-yellow { background: rgba(232,255,71,0.12); color: var(--accent); }
+.badge-blue   { background: rgba(79,172,254,0.12); color: #4facfe; }
+
+
+/* ============================================================
+   13. WORKOUT LOG PAGE (log_workout.html)
+   Exercise list items shown in workout history
+   ============================================================ */
+
+.exercise-list { list-style: none; }
+
+.exercise-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.exercise-item-name   { font-weight: 500; }
+.exercise-item-detail { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+
+/* ============================================================
+   14. PROGRESS PAGE (progress.html)
+   Progress bar used for weekly goals on dashboard & progress
+   ============================================================ */
+
+.progress-bar-wrap {
+    background: var(--bg3);
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+/* Width is set dynamically by script.js */
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent), #b5d400);
+    transition: width 0.4s ease;
+}
+
+
+/* ============================================================
+   15. NUTRITION PAGE (nutrition.html)
+   Shares form & card styles from sections 4 and 9.
+   No additional styles needed beyond global ones.
+   ============================================================ */
+
+
+/* ============================================================
+   16. PROFILE PAGE (profile.html)
+   Large circular avatar showing user initials
+   ============================================================ */
+
+.profile-img-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--bg);
+    margin: 0 auto 16px;
+}
+
+
+/* ============================================================
+   17. ADMIN PAGE (admin.html)
+   Red "ADMIN" badge shown in the sidebar user section
+   ============================================================ */
+
+.admin-badge {
+    background: rgba(255,71,87,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(255,71,87,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   18. ALERTS & NOTIFICATIONS
+   Used on: all pages after form submissions
+   ============================================================ */
+
+.alert {
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Green — shown on success (e.g. "Workout logged!") */
+.alert-success {
+    background: rgba(67,233,123,0.1);
+    border: 1px solid rgba(67,233,123,0.2);
+    color: #43e97b;
+}
+
+/* Red — shown on error (e.g. "Invalid password") */
+.alert-error {
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.2);
+    color: var(--accent2);
+}
+
+
+/* ============================================================
+   19. LAYOUT HELPERS
+   Used on: dashboard.html, log_workout.html, nutrition.html,
+            profile.html, admin.html
+   ============================================================ */
+
+/* Two equal columns side by side */
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Three equal columns side by side */
+.three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+
+/* ============================================================
+   20. RESPONSIVE DESIGN
+   ============================================================ */
+
+/* 20.1 - Tablet (max-width: 900px) */
+@media (max-width: 900px) {
+    /* Hide left branding panel on auth pages */
+    .auth-page { grid-template-columns: 1fr; }
+    .auth-left  { display: none; }
+
+    /* Stack stat cards into 2 columns */
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+
+    /* Stack two/three column layouts into single column */
+    .two-col, .three-col, .log-form { grid-template-columns: 1fr; }
+
+    /* Shrink sidebar width slightly */
+    :root { --sidebar: 200px; }
+}
+
+/* 20.2 - Mobile (max-width: 600px) */
+@media (max-width: 600px) {
+    /* Single column stat cards */
+    .stats-grid { grid-template-columns: 1fr; }
+
+    /* Reduce page padding */
+    .main-content { padding: 16px; }
+
+    /* Hide sidebar on small screens */
+    .sidebar { display: none; }
+
+    /* Full-width content when no sidebar */
+    .main-content { margin-left: 0; max-width: 100vw; }
+}
