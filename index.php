@@ -1,3 +1,32 @@
+<?php
+session_start();
+require "db.php";
+
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['role'] == 'student') { header("Location: dashboard.php"); }
+    else { header("Location: admin.php"); }
+    exit;
+}
+
+$error = false;
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $user = mysqli_real_escape_string($conn, $_POST['username']);
+    $pass = md5($_POST['password']);
+    $res  = mysqli_query($conn, "SELECT * FROM users WHERE username='$user' AND password='$pass'");
+    if (mysqli_num_rows($res) == 1) {
+        $row = mysqli_fetch_assoc($res);
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['role']    = $row['role'];
+        $_SESSION['name']    = $row['name'];
+        if (isset($_POST['remember'])) setcookie("fit_user", $row['username'], time()+60*60*24*30, "/");
+        if ($row['role'] == 'student') { header("Location: dashboard.php"); }
+        else { header("Location: admin.php"); }
+        exit;
+    } else {
+        $error = true;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,24 +69,30 @@
             <h2>Welcome Back</h2>
             <p>Sign in to your training account</p>
 
-            <div id="errorMsg" class="alert alert-error" style="display:none;">
-                ⚠ Invalid username or password.
-            </div>
+           <?php if ($error): ?>
+<div class="alert alert-error">
+    ⚠ Invalid username or password.
+</div>
+<?php endif; ?>
 
-            <form id="loginForm">
+            <form method="POST" onsubmit="return validateLogin();">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="loginUser" placeholder="Enter your username" required>
+                    <input type="text" id="loginUser" name="username" placeholder="Enter your username" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="loginPass" placeholder="Enter your password" required>
+                    <input type="password" id="loginPass" name="password" placeholder="Enter your password" required>
                 </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" name="remember" style="width:auto;">
+    <label style="margin:0;">Remember me</label>
+</div>
                 <button type="submit" class="btn-primary">LOGIN</button>
             </form>
 
             <div class="auth-link">
-                Don't have an account? <a href="register.html">Register here</a>
+                Don't have an account? <a href="register.php">Register here</a>
             </div>
 
             <div style="margin-top: 32px; padding: 16px; background: var(--bg2); border-radius: 10px; border: 1px solid var(--border);">
