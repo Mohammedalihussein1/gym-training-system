@@ -4,9 +4,9 @@
 
 // ---- DEMO USERS (will be replaced by PHP + MySQL later) ----
 const DEMO_USERS = [
-    { username: 'admin',   password: 'admin123',   role: 'admin',       name: 'Admin',           id: 'ADM001', program: 'Administration', age: 30, height: 175, weight: 70 },
-    { username: 'coord',   password: 'coord123',   role: 'coordinator', name: 'Coordinator Ali', id: 'COO001', program: 'Coordination',    age: 35, height: 180, weight: 80 },
-    { username: 'student', password: 'student123', role: 'student',     name: 'Muhammad Ali',    id: 'STU001', program: 'Computer Science', age: 21, height: 175, weight: 70 },
+    { username: 'admin', password: 'admin123', role: 'admin', name: 'Admin', id: 'ADM001', program: 'Administration', age: 30, height: 175, weight: 70 },
+    { username: 'coord', password: 'coord123', role: 'coordinator', name: 'Coordinator Ali', id: 'COO001', program: 'Coordination', age: 35, height: 180, weight: 80 },
+    { username: 'student', password: 'student123', role: 'student', name: 'Muhammad Ali', id: 'STU001', program: 'Computer Science', age: 21, height: 175, weight: 70 },
 ];
 
 // ============================================================
@@ -22,6 +22,11 @@ function formatDate(d) {
     return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function validateLogin() {
+    // Keep PHP login form submission compatible with client-side validation.
+    return true;
+}
+
 function calcBMI(weight, height) {
     if (!weight || !height) return '--';
     return (weight / ((height / 100) ** 2)).toFixed(1);
@@ -31,8 +36,8 @@ function bmiStatus(bmi) {
     const b = parseFloat(bmi);
     if (isNaN(b)) return '—';
     if (b < 18.5) return 'Underweight';
-    if (b < 25)   return 'Normal';
-    if (b < 30)   return 'Overweight';
+    if (b < 25) return 'Normal';
+    if (b < 30) return 'Overweight';
     return 'Obese';
 }
 
@@ -42,7 +47,7 @@ function initials(name) {
 
 function showDate() {
     const el = document.getElementById('todayDate');
-    if (el) el.textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+    if (el) el.textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 }
 
 // ============================================================
@@ -68,10 +73,10 @@ function getCurrentUser() {
 
 function requireLogin(allowedRoles) {
     const user = getCurrentUser();
-    if (!user) { window.location.href = 'index.html'; return null; }
+    if (!user) { window.location.href = 'index.php'; return null; }
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         alert('Access denied.');
-        window.location.href = 'index.html';
+        window.location.href = 'index.php';
         return null;
     }
     return user;
@@ -85,7 +90,7 @@ function logout() {
 // LOGIN FORM
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const username = document.getElementById('loginUser').value.trim();
         const password = document.getElementById('loginPass').value;
@@ -107,18 +112,18 @@ if (loginForm) {
 // REGISTER FORM
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
-    registerForm.addEventListener('submit', function(e) {
+    registerForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const errEl = document.getElementById('errorMsg');
-        const name     = document.getElementById('regName').value.trim();
-        const id       = document.getElementById('regId').value.trim();
+        const name = document.getElementById('regName').value.trim();
+        const id = document.getElementById('regId').value.trim();
         const username = document.getElementById('regUser').value.trim();
         const password = document.getElementById('regPass').value;
-        const age      = parseInt(document.getElementById('regAge').value);
-        const gender   = document.getElementById('regGender').value;
-        const height   = parseInt(document.getElementById('regHeight').value);
-        const weight   = parseInt(document.getElementById('regWeight').value);
-        const program  = document.getElementById('regProgram').value.trim();
+        const age = parseInt(document.getElementById('regAge').value);
+        const gender = document.getElementById('regGender').value;
+        const height = parseInt(document.getElementById('regHeight').value);
+        const weight = parseInt(document.getElementById('regWeight').value);
+        const program = document.getElementById('regProgram').value.trim();
 
         // Validation
         if (!name || !username || !password || !id || !program) {
@@ -140,7 +145,7 @@ if (registerForm) {
 
         errEl.style.display = 'none';
         document.getElementById('successMsg').style.display = 'flex';
-        setTimeout(() => window.location.href = 'index.html', 1500);
+        setTimeout(() => window.location.href = 'index.php', 1500);
     });
 }
 
@@ -176,17 +181,17 @@ if (workoutForm) {
         document.getElementById('wDate').value = today();
         renderWorkoutHistory(user.username);
 
-        workoutForm.addEventListener('submit', function(e) {
+        workoutForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const entry = {
                 id: Date.now(),
-                date:     document.getElementById('wDate').value,
-                type:     document.getElementById('wType').value,
-                sets:     document.getElementById('wSets').value || '-',
-                reps:     document.getElementById('wReps').value || '-',
+                date: document.getElementById('wDate').value,
+                type: document.getElementById('wType').value,
+                sets: document.getElementById('wSets').value || '-',
+                reps: document.getElementById('wReps').value || '-',
                 calories: parseInt(document.getElementById('wCalories').value),
                 duration: parseInt(document.getElementById('wDuration').value),
-                notes:    document.getElementById('wNotes').value
+                notes: document.getElementById('wNotes').value
             };
             const workouts = getWorkouts(user.username);
             workouts.push(entry);
@@ -205,9 +210,9 @@ function renderWorkoutHistory(username, filter = '', sort = 'newest') {
     let workouts = getWorkouts(username);
 
     if (filter) workouts = workouts.filter(w => w.type.toLowerCase().includes(filter.toLowerCase()));
-    if (sort === 'newest')   workouts.sort((a,b) => b.date.localeCompare(a.date));
-    if (sort === 'oldest')   workouts.sort((a,b) => a.date.localeCompare(b.date));
-    if (sort === 'calories') workouts.sort((a,b) => b.calories - a.calories);
+    if (sort === 'newest') workouts.sort((a, b) => b.date.localeCompare(a.date));
+    if (sort === 'oldest') workouts.sort((a, b) => a.date.localeCompare(b.date));
+    if (sort === 'calories') workouts.sort((a, b) => b.calories - a.calories);
 
     if (workouts.length === 0) {
         list.innerHTML = '<li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No workouts found.</li>';
@@ -240,7 +245,7 @@ function filterWorkouts() {
     const user = getCurrentUser();
     if (!user) return;
     const filter = document.getElementById('searchWorkout').value;
-    const sort   = document.getElementById('sortWorkout').value;
+    const sort = document.getElementById('sortWorkout').value;
     renderWorkoutHistory(user.username, filter, sort);
 }
 
@@ -265,17 +270,17 @@ if (nutritionForm) {
         renderNutritionStats(user.username);
         renderMealHistory(user.username);
 
-        nutritionForm.addEventListener('submit', function(e) {
+        nutritionForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const meal = {
-                id:       Date.now(),
-                date:     document.getElementById('nDate').value,
+                id: Date.now(),
+                date: document.getElementById('nDate').value,
                 mealType: document.getElementById('nMealType').value,
-                food:     document.getElementById('nFood').value,
+                food: document.getElementById('nFood').value,
                 calories: parseInt(document.getElementById('nCalories').value),
-                protein:  parseInt(document.getElementById('nProtein').value) || 0,
-                carbs:    parseInt(document.getElementById('nCarbs').value)    || 0,
-                fats:     parseInt(document.getElementById('nFats').value)     || 0
+                protein: parseInt(document.getElementById('nProtein').value) || 0,
+                carbs: parseInt(document.getElementById('nCarbs').value) || 0,
+                fats: parseInt(document.getElementById('nFats').value) || 0
             };
             const meals = getMeals(user.username);
             meals.push(meal);
@@ -293,7 +298,7 @@ if (nutritionForm) {
 function renderNutritionStats(username) {
     const todayStr = today();
     const meals = getMeals(username).filter(m => m.date === todayStr);
-    const totalCal  = meals.reduce((s, m) => s + m.calories, 0);
+    const totalCal = meals.reduce((s, m) => s + m.calories, 0);
     const totalProt = meals.reduce((s, m) => s + m.protein, 0);
     const totalCarb = meals.reduce((s, m) => s + m.carbs, 0);
     const el1 = document.getElementById('totalCalIn');
@@ -308,9 +313,9 @@ function renderMealHistory(username, filter = '', typeFilter = 'all') {
     const list = document.getElementById('mealHistoryList');
     if (!list) return;
     let meals = getMeals(username);
-    if (filter)             meals = meals.filter(m => m.food.toLowerCase().includes(filter.toLowerCase()));
+    if (filter) meals = meals.filter(m => m.food.toLowerCase().includes(filter.toLowerCase()));
     if (typeFilter !== 'all') meals = meals.filter(m => m.mealType === typeFilter);
-    meals.sort((a,b) => b.date.localeCompare(a.date));
+    meals.sort((a, b) => b.date.localeCompare(a.date));
 
     if (meals.length === 0) {
         list.innerHTML = '<li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals found.</li>';
@@ -344,7 +349,7 @@ function filterMeals() {
     const user = getCurrentUser();
     if (!user) return;
     const filter = document.getElementById('searchMeal').value;
-    const type   = document.getElementById('filterMealType').value;
+    const type = document.getElementById('filterMealType').value;
     renderMealHistory(user.username, filter, type);
 }
 // DASHBOARD
@@ -358,25 +363,25 @@ if (dashboardPage && document.getElementById('totalCalories')) {
 
         // Profile info
         document.getElementById('welcomeMsg').textContent = 'Welcome back, ' + user.name + '!';
-        document.getElementById('profileName').textContent   = user.name;
-        document.getElementById('profileId').textContent     = user.id;
+        document.getElementById('profileName').textContent = user.name;
+        document.getElementById('profileId').textContent = user.id;
         document.getElementById('profileHeight').textContent = user.height + ' cm';
         document.getElementById('profileWeight').textContent = user.weight + ' kg';
-        document.getElementById('dashAvatar').textContent    = initials(user.name);
+        document.getElementById('dashAvatar').textContent = initials(user.name);
 
         const bmi = calcBMI(user.weight, user.height);
-        document.getElementById('userBMI').textContent   = bmi;
+        document.getElementById('userBMI').textContent = bmi;
         document.getElementById('bmiStatus').textContent = bmiStatus(bmi);
 
         // Today's stats
-        const todayStr   = today();
-        const workouts   = getWorkouts(user.username).filter(w => w.date === todayStr);
-        const meals      = getMeals(user.username).filter(m => m.date === todayStr);
-        const calBurned  = workouts.reduce((s, w) => s + w.calories, 0);
-        const calIn      = meals.reduce((s, m) => s + m.calories, 0);
+        const todayStr = today();
+        const workouts = getWorkouts(user.username).filter(w => w.date === todayStr);
+        const meals = getMeals(user.username).filter(m => m.date === todayStr);
+        const calBurned = workouts.reduce((s, w) => s + w.calories, 0);
+        const calIn = meals.reduce((s, m) => s + m.calories, 0);
 
         document.getElementById('totalCalories').textContent = calBurned;
-        document.getElementById('caloriesIn').textContent    = calIn;
+        document.getElementById('caloriesIn').textContent = calIn;
 
         // Weekly workouts
         const now = new Date();
@@ -390,8 +395,8 @@ if (dashboardPage && document.getElementById('totalCalories')) {
         const wPct = Math.min((weekWorkouts.length / 5) * 100, 100);
         const weekCal = weekWorkouts.reduce((s, w) => s + w.calories, 0);
         const cPct = Math.min((weekCal / 3500) * 100, 100);
-        document.getElementById('workoutGoalBar').style.width  = wPct + '%';
-        document.getElementById('calorieGoalBar').style.width  = cPct + '%';
+        document.getElementById('workoutGoalBar').style.width = wPct + '%';
+        document.getElementById('calorieGoalBar').style.width = cPct + '%';
         document.getElementById('workoutGoalText').textContent = weekWorkouts.length + ' / 5 sessions';
         document.getElementById('calorieGoalText').textContent = weekCal + ' / 3,500 kcal';
 
@@ -441,8 +446,8 @@ function renderProgressTable(username, filter = '', sort = 'newest', dateFilter 
     let workouts = getWorkouts(username);
 
     // Overall stats
-    const totalCal  = workouts.reduce((s, w) => s + w.calories, 0);
-    const totalMin  = workouts.reduce((s, w) => s + w.duration, 0);
+    const totalCal = workouts.reduce((s, w) => s + w.calories, 0);
+    const totalMin = workouts.reduce((s, w) => s + w.duration, 0);
     const uniqueDays = [...new Set(workouts.map(w => w.date))].length;
     const el1 = document.getElementById('allCalories');
     const el2 = document.getElementById('allSessions');
@@ -453,12 +458,12 @@ function renderProgressTable(username, filter = '', sort = 'newest', dateFilter 
     if (el3) el3.textContent = totalMin;
     if (el4) el4.textContent = uniqueDays;
 
-    if (filter)     workouts = workouts.filter(w => w.type.toLowerCase().includes(filter.toLowerCase()));
+    if (filter) workouts = workouts.filter(w => w.type.toLowerCase().includes(filter.toLowerCase()));
     if (dateFilter) workouts = workouts.filter(w => w.date === dateFilter);
-    if (sort === 'newest')   workouts.sort((a,b) => b.date.localeCompare(a.date));
-    if (sort === 'oldest')   workouts.sort((a,b) => a.date.localeCompare(b.date));
-    if (sort === 'calories') workouts.sort((a,b) => b.calories - a.calories);
-    if (sort === 'duration') workouts.sort((a,b) => b.duration - a.duration);
+    if (sort === 'newest') workouts.sort((a, b) => b.date.localeCompare(a.date));
+    if (sort === 'oldest') workouts.sort((a, b) => a.date.localeCompare(b.date));
+    if (sort === 'calories') workouts.sort((a, b) => b.calories - a.calories);
+    if (sort === 'duration') workouts.sort((a, b) => b.duration - a.duration);
 
     const tbody = document.getElementById('progressTableBody');
     if (!tbody) return;
@@ -485,8 +490,8 @@ function filterProgress() {
     const user = getCurrentUser();
     if (!user) return;
     const filter = document.getElementById('searchProgress').value;
-    const sort   = document.getElementById('sortProgress').value;
-    const date   = document.getElementById('filterDate').value;
+    const sort = document.getElementById('sortProgress').value;
+    const date = document.getElementById('filterDate').value;
     renderProgressTable(user.username, filter, sort, date);
 }
 
@@ -518,10 +523,10 @@ function renderAdminOverview(filter = '', sort = 'az') {
 
     students.forEach(s => {
         const workouts = getWorkouts(s.username);
-        const meals    = getMeals(s.username);
+        const meals = getMeals(s.username);
         totalSessions += workouts.length;
-        totalCal      += workouts.reduce((sum, w) => sum + w.calories, 0);
-        totalMeals    += meals.length;
+        totalCal += workouts.reduce((sum, w) => sum + w.calories, 0);
+        totalMeals += meals.length;
         workouts.forEach(w => allActivity.push({ student: s.name, ...w }));
     });
 
@@ -540,9 +545,9 @@ function renderAdminOverview(filter = '', sort = 'az') {
     });
 
     if (filter) list = list.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || s.id.toLowerCase().includes(filter.toLowerCase()));
-    if (sort === 'az')       list.sort((a,b) => a.name.localeCompare(b.name));
-    if (sort === 'za')       list.sort((a,b) => b.name.localeCompare(a.name));
-    if (sort === 'sessions') list.sort((a,b) => b.sessionCount - a.sessionCount);
+    if (sort === 'az') list.sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === 'za') list.sort((a, b) => b.name.localeCompare(a.name));
+    if (sort === 'sessions') list.sort((a, b) => b.sessionCount - a.sessionCount);
 
     const tbody = document.getElementById('adminStudentTable');
     if (tbody) {
@@ -554,7 +559,7 @@ function renderAdminOverview(filter = '', sort = 'az') {
                 const status = bmiStatus(bmi);
                 const statusClass = status === 'Normal' ? 'badge-green' : status === 'Overweight' ? 'badge-yellow' : 'badge-red';
                 return `<tr>
-                    <td style="color:var(--muted)">${i+1}</td>
+                    <td style="color:var(--muted)">${i + 1}</td>
                     <td><strong>${s.name}</strong></td>
                     <td style="color:var(--muted)">${s.id}</td>
                     <td>${s.program}</td>
@@ -568,7 +573,7 @@ function renderAdminOverview(filter = '', sort = 'az') {
     }
 
     // Recent activity
-    allActivity.sort((a,b) => b.date.localeCompare(a.date));
+    allActivity.sort((a, b) => b.date.localeCompare(a.date));
     const recentTbody = document.getElementById('recentActivityTable');
     if (recentTbody) {
         if (allActivity.length === 0) {
@@ -589,6 +594,6 @@ function renderAdminOverview(filter = '', sort = 'az') {
 
 function filterAdminStudents() {
     const filter = document.getElementById('searchStudent').value;
-    const sort   = document.getElementById('sortStudent').value;
+    const sort = document.getElementById('sortStudent').value;
     renderAdminOverview(filter, sort);
 }

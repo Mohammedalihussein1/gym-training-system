@@ -1,0 +1,182 @@
+<?php
+session_start();
+$user = $_SESSION['ft_current'] ?? null;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack Pro — Nutrition Log</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-text">FitTrack</div>
+            <div class="sidebar-logo-sub">TRAINING MANAGEMENT</div>
+        </div>
+        <div class="sidebar-user">
+            <div class="avatar" id="sidebarAvatar">MU</div>
+            <div>
+                <div class="sidebar-user-name" id="sidebarName">Student</div>
+                <div class="sidebar-user-role">Student</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <a href="dashboard.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="log_workout.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+                Log Workout
+            </a>
+            <a href="nutrition.php" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+                Nutrition Log
+            </a>
+            <a href="progress.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    
+                 My Progress
+            </a>
+            <div class="nav-section-title">Profile</div>
+            <a href="profile.html" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Profile
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <button class="nav-item btn-secondary" onclick="logout()" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="page-header">
+            <div>
+                <div class="page-title">Nutrition Log</div>
+                <div class="page-subtitle">Track what you eat today</div>
+            </div>
+            <div class="page-date" id="todayDate"></div>
+        </div>
+
+        <!-- SUMMARY STATS -->
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-card green">
+                <div class="stat-icon green">🥗</div>
+                <div class="stat-value green" id="totalCalIn">0</div>
+                <div class="stat-label">Total Calories In (kcal)</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="stat-icon yellow">🍗</div>
+                <div class="stat-value yellow" id="totalProtein">0g</div>
+                <div class="stat-label">Total Protein</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-icon blue">🍞</div>
+                <div class="stat-value blue" id="totalCarbs">0g</div>
+                <div class="stat-label">Total Carbs</div>
+            </div>
+        </div>
+
+        <div id="successMsg" class="alert alert-success" style="display:none;">✓ Meal logged successfully!</div>
+
+        <div class="two-col">
+
+            <!-- LOG FORM -->
+            <div class="card">
+                <div class="card-title" style="margin-bottom:20px;">Log a Meal</div>
+
+                <form id="nutritionForm">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="nDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Meal Type</label>
+                        <select id="nMealType" required>
+                            <option value="">Select meal</option>
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Dinner">Dinner</option>
+                            <option value="Snack">Snack</option>
+                            <option value="Pre-workout">Pre-workout</option>
+                            <option value="Post-workout">Post-workout</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Food Description</label>
+                        <input type="text" id="nFood" placeholder="e.g. Grilled chicken with rice" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Calories (kcal)</label>
+                            <input type="number" id="nCalories" placeholder="e.g. 450" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Protein (g)</label>
+                            <input type="number" id="nProtein" placeholder="e.g. 30" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Carbs (g)</label>
+                            <input type="number" id="nCarbs" placeholder="e.g. 60" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Fats (g)</label>
+                            <input type="number" id="nFats" placeholder="e.g. 10" min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">LOG MEAL</button>
+                </form>
+            </div>
+            <!-- MEAL HISTORY -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Meal History</div>
+                        <div class="card-subtitle">All your logged meals</div>
+                    </div>
+                </div>
+
+                <div class="search-bar">
+                    <input class="search-input" type="text" id="searchMeal" placeholder="Search by food..." oninput="filterMeals()">
+                    <select class="search-select" id="filterMealType" onchange="filterMeals()">
+                        <option value="all">All Meals</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snack">Snack</option>
+                    </select>
+                </div>
+
+                <ul class="exercise-list" id="mealHistoryList">
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals logged yet.</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+<?php if ($user): ?>
+<script>
+try {
+    sessionStorage.setItem('ft_current', <?php echo json_encode($user, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>);
+} catch(e) {}
+</script>
+<?php endif; ?>
+</body>
+</html>
