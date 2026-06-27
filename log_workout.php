@@ -1,3 +1,44 @@
+<?php
+session_start();
+require "db.php";
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student') {
+    header("Location: index.php");
+    exit;
+}
+
+$uid = $_SESSION['user_id'];
+$me = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$uid"));
+$ini = strtoupper(substr($me['name'],0,2));
+$msg = "";
+
+// ADD workout
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $ex   = mysqli_real_escape_string($conn, $_POST['exercise']);
+    $cal  = (int)$_POST['calories'];
+    $dur  = (int)$_POST['duration'];
+    $date = mysqli_real_escape_string($conn, $_POST['date']);
+    mysqli_query($conn, "INSERT INTO workouts (user_id, exercise, duration, calories, date) VALUES ($uid, '$ex', $dur, $cal, '$date')");
+    $msg = "<div class='alert alert-success'>✓ Workout logged successfully!</div>";
+}
+
+// DELETE workout
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
+    mysqli_query($conn, "DELETE FROM workouts WHERE id=$id AND user_id=$uid");
+    header("Location: log_workout.php");
+    exit;
+}
+
+// SEARCH + SORT
+$q    = isset($_GET['q']) ? mysqli_real_escape_string($conn, $_GET['q']) : "";
+$sort = isset($_GET['sort']) ? $_GET['sort'] : "newest";
+$order = $sort=="oldest" ? "date ASC" : ($sort=="calories" ? "calories DESC" : "date DESC");
+$sql = "SELECT * FROM workouts WHERE user_id=$uid";
+if ($q != "") $sql .= " AND exercise LIKE '%$q%'";
+$sql .= " ORDER BY $order";
+$result = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,41 +56,41 @@
             <div class="sidebar-logo-sub">TRAINING MANAGEMENT</div>
         </div>
         <div class="sidebar-user">
-            <div class="avatar" id="sidebarAvatar">MU</div>
+            <div class="avatar" id="sidebarAvatar"><?= $ini ?></div>
             <div>
-                <div class="sidebar-user-name" id="sidebarName">Student</div>
+                <div class="sidebar-user-name" id="sidebarName"><?= htmlspecialchars($me['name']) ?></div>
                 <div class="sidebar-user-role">Student</div>
             </div>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Main</div>
-            <a href="dashboard.html" class="nav-item">
+            <a href="dashboard.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
-            <a href="log_workout.html" class="nav-item active">
+            <a href="log_workout.php" class="nav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
                 Log Workout
             </a>
-            <a href="nutrition.html" class="nav-item">
+            <a href="nutrition.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
                 Nutrition Log
             </a>
-            <a href="progress.html" class="nav-item">
+            <a href="progress.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 My Progress
             </a>
             <div class="nav-section-title">Profile</div>
-            <a href="profile.html" class="nav-item">
+            <a href="profile.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 My Profile
             </a>
         </nav>
         <div class="sidebar-bottom">
-            <button class="nav-item btn-secondary" onclick="logout()" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
+            <a href="logout.php" class="nav-item btn-secondary" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -60,11 +101,10 @@
                 <div class="page-title">Log Workout</div>
                 <div class="page-subtitle">Record your training session</div>
             </div>
-            <div class="page-date" id="todayDate"></div>
+            <div class="page-date" id="todayDate"><?= date('l, F j, Y') ?></div>
         </div>
 
-        <div id="successMsg" class="alert alert-success" style="display:none;">✓ Workout logged successfully!</div>
-        <div id="errorMsg" class="alert alert-error" style="display:none;"></div>
+        <?= $msg ?>
 
         <div class="two-col">
 
@@ -72,14 +112,14 @@
             <div class="card">
                 <div class="card-title" style="margin-bottom:20px;">New Workout Entry</div>
 
-                <form id="workoutForm">
+                <form method="POST" onsubmit="return validateWorkout();">
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" id="wDate" required>
+                        <input type="date" id="wDate" name="date" value="<?= date('Y-m-d') ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Exercise Type</label>
-                        <select id="wType" required>
+                        <select id="exercise" name="exercise" required>
                             <option value="">Select exercise</option>
                             <option value="Push-ups">Push-ups</option>
                             <option value="Pull-ups">Pull-ups</option>
@@ -106,11 +146,11 @@
                     </div>
                     <div class="form-group">
                         <label>Calories Burned (kcal)</label>
-                        <input type="number" id="wCalories" placeholder="e.g. 250" min="0" required>
+                        <input type="number" id="calories" name="calories" placeholder="e.g. 250" min="0" required>
                     </div>
                     <div class="form-group">
                         <label>Duration (minutes)</label>
-                        <input type="number" id="wDuration" placeholder="e.g. 45" min="1" required>
+                        <input type="number" id="duration" name="duration" placeholder="e.g. 45" min="1" required>
                     </div>
                     <div class="form-group">
                         <label>Notes (optional)</label>
@@ -129,17 +169,31 @@
                     </div>
                 </div>
 
-                <div class="search-bar">
-                    <input class="search-input" type="text" id="searchWorkout" placeholder="Search by exercise..." oninput="filterWorkouts()">
-                    <select class="search-select" id="sortWorkout" onchange="filterWorkouts()">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="calories">Most Calories</option>
+                <form method="GET" class="search-bar">
+                    <input class="search-input" type="text" name="q" placeholder="Search by exercise..." value="<?= htmlspecialchars($q) ?>">
+                    <select class="search-select" name="sort">
+                        <option value="newest"<?= $sort=='newest'?' selected':'' ?>>Newest First</option>
+                        <option value="oldest"<?= $sort=='oldest'?' selected':'' ?>>Oldest First</option>
+                        <option value="calories"<?= $sort=='calories'?' selected':'' ?>>Most Calories</option>
                     </select>
-                </div>
+                    <button type="submit" class="btn-secondary">Search</button>
+                </form>
 
                 <ul class="exercise-list" id="workoutHistoryList">
-                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No workouts logged yet.</li>
+                    <?php if (mysqli_num_rows($result) == 0): ?>
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No workouts found.</li>
+                    <?php else: while($w = mysqli_fetch_assoc($result)): ?>
+                    <li class="exercise-item">
+                        <div>
+                            <div class="exercise-item-name"><?= htmlspecialchars($w['exercise']) ?></div>
+                            <div class="exercise-item-detail"><?= $w['date'] ?> · <?= $w['duration'] ?> min</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="badge badge-yellow"><?= $w['calories'] ?> kcal</span>
+                            <a href="?delete=<?= $w['id'] ?>" class="btn-danger" style="margin-top:6px; padding:4px 10px; font-size:12px;" onclick="return confirm('Delete?')">Delete</a>
+                        </div>
+                    </li>
+                    <?php endwhile; endif; ?>
                 </ul>
             </div>
 
