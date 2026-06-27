@@ -128,7 +128,7 @@ try {
 <script>
 (function() {
     const user = JSON.parse(sessionStorage.getItem('ft_current'));
-    if (!user) { window.location.href = 'index.html'; return; }
+    if (!user) { window.location.href = 'index.php'; return; }
 
     function initials(n) { return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
     function calcBMI(w,h) { return (w/((h/100)**2)).toFixed(1); }
