@@ -28,11 +28,11 @@ $user = $_SESSION['ft_current'] ?? null;
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Main</div>
-            <a href="dashboard.html" class="nav-item">
+            <a href="dashboard.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
-            <a href="log_workout.html" class="nav-item">
+            <a href="log_workout.php    " class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
                 Log Workout
             </a>
@@ -40,13 +40,13 @@ $user = $_SESSION['ft_current'] ?? null;
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
                 Nutrition Log
             </a>
-            <a href="progress.html" class="nav-item">
+            <a href="progress.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     
                  My Progress
             </a>
             <div class="nav-section-title">Profile</div>
-            <a href="profile.html" class="nav-item">
+            <a href="profile.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 My Profile
             </a>
