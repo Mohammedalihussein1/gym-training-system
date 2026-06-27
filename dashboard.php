@@ -20,7 +20,12 @@ $todayMl = mysqli_query($conn, "SELECT * FROM meals WHERE user_id=$uid AND date=
 $ini = strtoupper(substr($me['name'],0,2));
 $wkPercent  = min(100, $wkWeek * 20);
 $calWeekTot = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COALESCE(SUM(calories),0) c FROM workouts WHERE user_id=$uid"))['c'];
-$calPercent = min(100, round($calWeekTot / 3500 * 100));
+$calPercent =  min(100, round($calWeekTot / 3500 * 100));
+$bmi = 0;
+if ($me['height'] > 0) {
+    $h = $me['height'] / 100;
+    $bmi = round($me['weight'] / ($h * $h), 1);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -108,7 +113,7 @@ $calPercent = min(100, round($calWeekTot / 3500 * 100));
             </div>
             <div class="stat-card blue">
                 <div class="stat-icon blue">⚖️</div>
-                <div class="stat-value blue" id="userBMI">--</div>
+                <div class="stat-value blue" id="userBMI"><?= $bmi ?></div>
                 <div class="stat-label">Current BMI</div>
             </div>
             <div class="stat-card green">
@@ -192,13 +197,13 @@ $calPercent = min(100, round($calWeekTot / 3500 * 100));
 
                 <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Workouts (target: 5/week)</p>
                 <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" id="workoutGoalBar" style=width:<?= $wkPercent ?>%></div>
+                    <div class="progress-bar-fill" id="workoutGoalBar" style="width:<?= $wkPercent ?>%"></div>
                 </div>
                 <p style="font-size:12px; color:var(--muted); margin-top:4px; margin-bottom:20px;" id="workoutGoalText"><?= $wkWeek ?> / 5 sessions</p>
 
                 <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Calories Burned (target: 3,500 kcal/week)</p>
                 <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" id="calorieGoalBar" style=width:<?= $calPercent ?>%; background: linear-gradient(90deg, var(--accent2), #ff8a00);"></div>
+                    <div class="progress-bar-fill" id="calorieGoalBar" style="width:<?= $calPercent ?>%; background: linear-gradient(90deg, var(--accent2), #ff8a00);"></div>
                 </div>
                 <p style="font-size:12px; color:var(--muted); margin-top:4px;" id="calorieGoalText"><?= $calWeekTot ?> / 3,500 kcal</p>
 
