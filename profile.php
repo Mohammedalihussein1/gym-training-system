@@ -1,6 +1,32 @@
 <?php
 session_start();
-$user = $_SESSION['ft_current'] ?? null;
+require "db.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
+$uid = $_SESSION['user_id'];
+$msg = "";
+
+// SAVE profile changes
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name    = mysqli_real_escape_string($conn, $_POST['name']);
+    $age     = (int)$_POST['age'];
+    $gender  = mysqli_real_escape_string($conn, $_POST['gender']);
+    $height  = (int)$_POST['height'];
+    $weight  = (int)$_POST['weight'];
+    $program = mysqli_real_escape_string($conn, $_POST['program']);
+
+    mysqli_query($conn, "UPDATE users SET name='$name', age=$age, gender='$gender', height=$height, weight=$weight, program='$program' WHERE id=$uid");
+    $_SESSION['name'] = $name;
+    $msg = "<div class='alert alert-success'>✓ Profile updated successfully!</div>";
+}
+
+// load my data
+$me = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$uid"));
+$ini = strtoupper(substr($me['name'],0,2));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,27 +46,27 @@ $user = $_SESSION['ft_current'] ?? null;
             <div class="sidebar-logo-sub">TRAINING MANAGEMENT</div>
         </div>
         <div class="sidebar-user">
-            <div class="avatar" id="sidebarAvatar">MU</div>
+            <div class="avatar" id="sidebarAvatar"><?= $ini ?></div>
             <div>
-                <div class="sidebar-user-name" id="sidebarName">Student</div>
+                <div class="sidebar-user-name" id="sidebarName"><?= htmlspecialchars($me['name']) ?></div>
                 <div class="sidebar-user-role">Student</div>
             </div>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Main</div>
-            <a href="dashboard.html" class="nav-item">
+            <a href="dashboard.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
-            <a href="log_workout.html" class="nav-item">
+            <a href="log_workout.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
                 Log Workout
             </a>
-            <a href="nutrition.html" class="nav-item">
+            <a href="nutrition.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
                 Nutrition Log
             </a>
-            <a href="progress.html" class="nav-item">
+            <a href="progress.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 My Progress
             </a>
@@ -51,10 +77,10 @@ $user = $_SESSION['ft_current'] ?? null;
             </a>
         </nav>
         <div class="sidebar-bottom">
-            <button class="nav-item btn-secondary" onclick="logout()" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
+            <a href="logout.php" class="nav-item btn-secondary" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
-            </button>
+            </a>
         </div>
     </aside>
     <main class="main-content">
@@ -66,47 +92,47 @@ $user = $_SESSION['ft_current'] ?? null;
             </div>
         </div>
 
-        <div id="successMsg" class="alert alert-success" style="display:none;">✓ Profile updated successfully!</div>
+        <?= $msg ?>
 
         <div class="two-col">
 <!-- EDIT FORM -->
             <div class="card">
                 <div class="card-title" style="margin-bottom:20px;">Edit Profile</div>
-                <form id="profileForm">
+                <form method="POST">
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="editName" required>
+                        <input type="text" id="editName" name="name" value="<?= htmlspecialchars($me['name']) ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Student ID (cannot be changed)</label>
-                        <input type="text" id="editId" disabled style="opacity:0.5; cursor:not-allowed;">
+                        <input type="text" id="editId" value="<?= htmlspecialchars($me['student_id']) ?>" disabled style="opacity:0.5; cursor:not-allowed;">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Age</label>
-                            <input type="number" id="editAge" min="10" max="100">
+                            <input type="number" id="editAge" name="age" value="<?= $me['age'] ?>" min="10" max="100">
                         </div>
                         <div class="form-group">
                             <label>Gender</label>
-                            <select id="editGender">
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
+                            <select id="editGender" name="gender">
+                                <option value="Male"<?= $me['gender']=='Male'?' selected':'' ?>>Male</option>
+                                <option value="Female"<?= $me['gender']=='Female'?' selected':'' ?>>Female</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Height (cm)</label>
-                            <input type="number" id="editHeight" min="100" max="250">
+                            <input type="number" id="editHeight" name="height" value="<?= $me['height'] ?>" min="100" max="250">
                         </div>
                         <div class="form-group">
                             <label>Weight (kg)</label>
-                            <input type="number" id="editWeight" min="30" max="300">
+                            <input type="number" id="editWeight" name="weight" value="<?= $me['weight'] ?>" min="30" max="300">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Program / Department</label>
-                        <input type="text" id="editProgram">
+                        <input type="text" id="editProgram" name="program" value="<?= htmlspecialchars($me['program']) ?>">
                     </div>
                     <button type="submit" class="btn-primary">SAVE CHANGES</button>
                 </form>
@@ -118,65 +144,5 @@ $user = $_SESSION['ft_current'] ?? null;
 </div>
 
 <script src="script.js"></script>
-<?php if ($user): ?>
-<script>
-try {
-    sessionStorage.setItem('ft_current', <?php echo json_encode($user, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>);
-} catch(e) {}
-</script>
-<?php endif; ?>
-<script>
-(function() {
-    const user = JSON.parse(sessionStorage.getItem('ft_current'));
-    if (!user) { window.location.href = 'index.php'; return; }
-
-    function initials(n) { return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
-    function calcBMI(w,h) { return (w/((h/100)**2)).toFixed(1); }
-
-    function loadProfile() {
-        // optional elements that some templates use
-        const av = document.getElementById('profileAvatar'); if (av) av.textContent = initials(user.name);
-        document.getElementById('sidebarAvatar').textContent      = initials(user.name);
-        document.getElementById('sidebarName').textContent        = user.name;
-        const pdn = document.getElementById('profileDisplayName'); if (pdn) pdn.textContent = user.name;
-        const pdi = document.getElementById('profileDisplayId'); if (pdi) pdi.textContent   = user.id;
-        const pr = document.getElementById('profileRole'); if (pr) pr.textContent        = (user.role||'').charAt(0).toUpperCase() + (user.role||'').slice(1);
-        const pp = document.getElementById('profileProgram'); if (pp) pp.textContent     = user.program;
-        const ph = document.getElementById('profileH'); if (ph) ph.textContent          = user.height + ' cm';
-        const pw = document.getElementById('profileW'); if (pw) pw.textContent          = user.weight + ' kg';
-        const pb = document.getElementById('profileBMI'); if (pb) pb.textContent        = calcBMI(user.weight, user.height);
-
-        document.getElementById('editName').value    = user.name;
-        document.getElementById('editId').value      = user.id;
-        document.getElementById('editAge').value     = user.age;
-        document.getElementById('editGender').value  = user.gender || 'Male';
-        document.getElementById('editHeight').value  = user.height;
-        document.getElementById('editWeight').value  = user.weight;
-        document.getElementById('editProgram').value = user.program;
-    }
-
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        user.name    = document.getElementById('editName').value.trim();
-        user.age     = parseInt(document.getElementById('editAge').value);
-        user.gender  = document.getElementById('editGender').value;
-        user.height  = parseInt(document.getElementById('editHeight').value);
-        user.weight  = parseInt(document.getElementById('editWeight').value);
-        user.program = document.getElementById('editProgram').value.trim();
-        sessionStorage.setItem('ft_current', JSON.stringify(user));
-
-        // Update in stored users
-        const stored = JSON.parse(localStorage.getItem('ft_users')) || [];
-        const idx = stored.findIndex(u => u.username === user.username);
-        if (idx !== -1) { stored[idx] = user; localStorage.setItem('ft_users', JSON.stringify(stored)); }
-
-        loadProfile();
-        document.getElementById('successMsg').style.display = 'flex';
-        setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
-    });
-
-    loadProfile();
-})();
-</script>
 </body>
 </html>

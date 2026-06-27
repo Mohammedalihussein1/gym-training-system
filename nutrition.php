@@ -1,6 +1,46 @@
 <?php
 session_start();
-$user = $_SESSION['ft_current'] ?? null;
+require "db.php";
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student') {
+    header("Location: index.php");
+    exit;
+}
+
+$uid = $_SESSION['user_id'];
+$me = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$uid"));
+$ini = strtoupper(substr($me['name'],0,2));
+$msg = "";
+
+// ADD a meal
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $food = mysqli_real_escape_string($conn, $_POST['food']);
+    $type = mysqli_real_escape_string($conn, $_POST['type']);
+    $cal  = (int)$_POST['calories'];
+    $date = mysqli_real_escape_string($conn, $_POST['date']);
+    mysqli_query($conn, "INSERT INTO meals (user_id, name, type, calories, date) VALUES ($uid, '$food', '$type', $cal, '$date')");
+    $msg = "<div class='alert alert-success'>✓ Meal logged successfully!</div>";
+}
+
+// DELETE a meal
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
+    mysqli_query($conn, "DELETE FROM meals WHERE id=$id AND user_id=$uid");
+    header("Location: nutrition.php");
+    exit;
+}
+
+// SEARCH + FILTER
+$q  = isset($_GET['q']) ? mysqli_real_escape_string($conn, $_GET['q']) : "";
+$tf = isset($_GET['type']) ? mysqli_real_escape_string($conn, $_GET['type']) : "all";
+$sql = "SELECT * FROM meals WHERE user_id=$uid";
+if ($q != "")     $sql .= " AND name LIKE '%$q%'";
+if ($tf != "all") $sql .= " AND type='$tf'";
+$sql .= " ORDER BY date DESC, id DESC";
+$result = mysqli_query($conn, $sql);
+
+// today's total calories
+$totalCal = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COALESCE(SUM(calories),0) c FROM meals WHERE user_id=$uid AND date=CURDATE()"))['c'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,9 +60,9 @@ $user = $_SESSION['ft_current'] ?? null;
             <div class="sidebar-logo-sub">TRAINING MANAGEMENT</div>
         </div>
         <div class="sidebar-user">
-            <div class="avatar" id="sidebarAvatar">MU</div>
+            <div class="avatar" id="sidebarAvatar"><?= $ini ?></div>
             <div>
-                <div class="sidebar-user-name" id="sidebarName">Student</div>
+                <div class="sidebar-user-name" id="sidebarName"><?= htmlspecialchars($me['name']) ?></div>
                 <div class="sidebar-user-role">Student</div>
             </div>
         </div>
@@ -32,7 +72,7 @@ $user = $_SESSION['ft_current'] ?? null;
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
-            <a href="log_workout.html" class="nav-item">
+            <a href="log_workout.php" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
                 Log Workout
             </a>
@@ -52,10 +92,10 @@ $user = $_SESSION['ft_current'] ?? null;
             </a>
         </nav>
         <div class="sidebar-bottom">
-            <button class="nav-item btn-secondary" onclick="logout()" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
+            <a href="logout.php" class="nav-item btn-secondary" style="width:100%; justify-content:flex-start; border:none; padding:11px 14px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -66,14 +106,14 @@ $user = $_SESSION['ft_current'] ?? null;
                 <div class="page-title">Nutrition Log</div>
                 <div class="page-subtitle">Track what you eat today</div>
             </div>
-            <div class="page-date" id="todayDate"></div>
+            <div class="page-date" id="todayDate"><?= date('l, F j, Y') ?></div>
         </div>
 
         <!-- SUMMARY STATS -->
         <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="stat-card green">
                 <div class="stat-icon green">🥗</div>
-                <div class="stat-value green" id="totalCalIn">0</div>
+                <div class="stat-value green" id="totalCalIn"><?= $totalCal ?></div>
                 <div class="stat-label">Total Calories In (kcal)</div>
             </div>
             <div class="stat-card yellow">
@@ -88,7 +128,7 @@ $user = $_SESSION['ft_current'] ?? null;
             </div>
         </div>
 
-        <div id="successMsg" class="alert alert-success" style="display:none;">✓ Meal logged successfully!</div>
+        <?= $msg ?>
 
         <div class="two-col">
 
@@ -96,14 +136,14 @@ $user = $_SESSION['ft_current'] ?? null;
             <div class="card">
                 <div class="card-title" style="margin-bottom:20px;">Log a Meal</div>
 
-                <form id="nutritionForm">
+                <form method="POST" onsubmit="return validateMeal();">
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" id="nDate" required>
+                        <input type="date" id="nDate" name="date" value="<?= date('Y-m-d') ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Meal Type</label>
-                        <select id="nMealType" required>
+                        <select id="nMealType" name="type" required>
                             <option value="">Select meal</option>
                             <option value="Breakfast">Breakfast</option>
                             <option value="Lunch">Lunch</option>
@@ -115,12 +155,12 @@ $user = $_SESSION['ft_current'] ?? null;
                     </div>
                     <div class="form-group">
                         <label>Food Description</label>
-                        <input type="text" id="nFood" placeholder="e.g. Grilled chicken with rice" required>
+                        <input type="text" id="mealName" name="food" placeholder="e.g. Grilled chicken with rice" required>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Calories (kcal)</label>
-                            <input type="number" id="nCalories" placeholder="e.g. 450" min="0" required>
+                            <input type="number" id="mealCal" name="calories" placeholder="e.g. 450" min="0" required>
                         </div>
                         <div class="form-group">
                             <label>Protein (g)</label>
@@ -149,19 +189,33 @@ $user = $_SESSION['ft_current'] ?? null;
                     </div>
                 </div>
 
-                <div class="search-bar">
-                    <input class="search-input" type="text" id="searchMeal" placeholder="Search by food..." oninput="filterMeals()">
-                    <select class="search-select" id="filterMealType" onchange="filterMeals()">
-                        <option value="all">All Meals</option>
-                        <option value="Breakfast">Breakfast</option>
-                        <option value="Lunch">Lunch</option>
-                        <option value="Dinner">Dinner</option>
-                        <option value="Snack">Snack</option>
+                <form method="GET" class="search-bar">
+                    <input class="search-input" type="text" name="q" placeholder="Search by food..." value="<?= htmlspecialchars($q) ?>">
+                    <select class="search-select" name="type">
+                        <option value="all"<?= $tf=='all'?' selected':'' ?>>All Meals</option>
+                        <option value="Breakfast"<?= $tf=='Breakfast'?' selected':'' ?>>Breakfast</option>
+                        <option value="Lunch"<?= $tf=='Lunch'?' selected':'' ?>>Lunch</option>
+                        <option value="Dinner"<?= $tf=='Dinner'?' selected':'' ?>>Dinner</option>
+                        <option value="Snack"<?= $tf=='Snack'?' selected':'' ?>>Snack</option>
                     </select>
-                </div>
+                    <button type="submit" class="btn-secondary">Search</button>
+                </form>
 
                 <ul class="exercise-list" id="mealHistoryList">
-                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals logged yet.</li>
+                    <?php if (mysqli_num_rows($result) == 0): ?>
+                    <li style="color:var(--muted); font-size:14px; text-align:center; padding:20px 0;">No meals found.</li>
+                    <?php else: while($m = mysqli_fetch_assoc($result)): ?>
+                    <li class="exercise-item">
+                        <div>
+                            <div class="exercise-item-name"><?= htmlspecialchars($m['name']) ?></div>
+                            <div class="exercise-item-detail"><?= $m['date'] ?> · <?= $m['type'] ?></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="badge badge-green"><?= $m['calories'] ?> kcal</span>
+                            <a href="?delete=<?= $m['id'] ?>" class="btn-danger" style="margin-top:6px; padding:4px 10px; font-size:12px;" onclick="return confirm('Delete?')">Delete</a>
+                        </div>
+                    </li>
+                    <?php endwhile; endif; ?>
                 </ul>
             </div>
 
@@ -171,12 +225,5 @@ $user = $_SESSION['ft_current'] ?? null;
 </div>
 
 <script src="script.js"></script>
-<?php if ($user): ?>
-<script>
-try {
-    sessionStorage.setItem('ft_current', <?php echo json_encode($user, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?>);
-} catch(e) {}
-</script>
-<?php endif; ?>
 </body>
 </html>
