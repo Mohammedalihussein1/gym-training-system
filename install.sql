@@ -13,7 +13,7 @@ CREATE TABLE users (
     password  VARCHAR(50),
     role      VARCHAR(20),
     name      VARCHAR(100),
-    sid       VARCHAR(20) UNIQUE,
+    student_id VARCHAR(20) UNIQUE,
     email     VARCHAR(100)
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE applications (
     date        DATE
 );
 
-INSERT INTO users (username, password, role, name, sid, email) VALUES
+INSERT INTO users (username, password, role, name, student_id, email) VALUES
 ('admin',   '0192023a7bbd73250516f069df18b500', 'admin',       'System Admin',    'ADM001', 'admin@fit.com'),
 ('coord',   'ca58303368b17874228d4c6e4d57c0d6', 'coordinator', 'Coordinator Ali', 'COO001', 'coord@fit.com'),
 ('student', 'ad6a280417a0f533d8b670c61667e1a0', 'student',     'Hama Karim',      'STU001', 'hama@fit.com'),

@@ -3,8 +3,8 @@ session_start();
 require "db.php";
 
 if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['role'] == 'student') { header("Location: dashboard.html"); }
-    else { header("Location: admin.html"); }
+    if ($_SESSION['role'] == 'student') { header("Location: dashboard.php"); }
+    else { header("Location: admin.php"); }
     exit;
 }
 
@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['role']    = $row['role'];
         $_SESSION['name']    = $row['name'];
         if (isset($_POST['remember'])) setcookie("fit_user", $row['username'], time()+60*60*24*30, "/");
-        if ($row['role'] == 'student') { header("Location: dashboard.html"); }
-        else { header("Location: admin.html"); }
+        if ($row['role'] == 'student') { header("Location: dashboard.php"); }
+        else { header("Location: admin.php"); }
         exit;
     } else {
         $error = true;
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
 
             <div class="auth-link">
-                Don't have an account? <a href="register.html">Register here</a>
+                Don't have an account? <a href="register.php">Register here</a>
             </div>
 
             <div style="margin-top: 32px; padding: 16px; background: var(--bg2); border-radius: 10px; border: 1px solid var(--border);">
