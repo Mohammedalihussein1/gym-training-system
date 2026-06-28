@@ -95,13 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 Don't have an account? <a href="register.php">Register here</a>
             </div>
 
-            <div style="margin-top: 32px; padding: 16px; background: var(--bg2); border-radius: 10px; border: 1px solid var(--border);">
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase;">Demo Accounts</p>
-                <p style="font-size: 13px; margin-bottom: 6px;">👤 Admin: <span style="color:var(--accent)">admin</span> / <span style="color:var(--accent)">admin123</span></p>
-                <p style="font-size: 13px; margin-bottom: 6px;">🎓 Coordinator: <span style="color:var(--accent)">coord</span> / <span style="color:var(--accent)">coord123</span></p>
-                <p style="font-size: 13px;">🏋️ Student: <span style="color:var(--accent)">student</span> / <span style="color:var(--accent)">student123</span></p>
-            </div>
-
         </div>
     </div>
 </div>
